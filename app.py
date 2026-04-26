@@ -1,16 +1,17 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
-from datetime import datetime
-import models
-from database import SessionLocal, engine
-from passlib.context import CryptContext
+from fastapi import FastAPI
+from database import init_db
+from routes import update_data, get_data, delete_data, recorder_data
 
 app = FastAPI(title="BOSCO AI")
+init_db()
 
-# Connexion à la base
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+app.include_router(recorder_data.router, prefix="/api",tags=["Enregistreur de donnes"])
+app.include_router(get.router, prefix="/api",tags=["Affichage"])
+app.include_router(update_data.router, prefix="/api",tags=["Modifier donnés"])
+app.include_router(delete.router, prefix="/api",tags=["Supprimés donnés"])
+
+@app.get("/")
+def home():
+    return {"message":"Serveur School  AI opértionnel !"}
+
+

@@ -13,6 +13,7 @@ class Trimestre(Base):
 class Professeur(Base):
     __tablename__ = "professeur"
     id = Column(Integer, primary_key=True, index=True)
+    genre_professeur=Column(String)
     nom_professeur = Column(String, unique=True, index=True)
     nom_matiere = Column(String)
     
@@ -27,11 +28,12 @@ class Feuille(Base):
     id = Column(Integer, primary_key=True, index=True)
     nom_feuille = Column(String)
     nombre_feuille = Column(Integer)
-
+    marque_feuille= Column(Integer,default="feuille simple")
 class Gestion(Base):
+    __tablename__ = "Gestion des feuilles"
     id = Column(Integer, primary_key=True, index=True)
-    
     nom_professeur = Column(String, unique=True, index=True)
+    nom_matiere=Column(String)
     nom_classe = Column(String)
     nom_feuille = Column(String)
     nombre_feuille = Column(Integer)
