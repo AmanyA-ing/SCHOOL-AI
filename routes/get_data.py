@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from .. import models
 from .. database import get_db
-router=APIRouter()
+router=RouterAPI()
 
 @router.get("/voir-trimestre")
 def voir_trimestre(db: Session = Depends(get_db)):
@@ -54,7 +54,7 @@ def voir_feuille(db: Session = Depends(get_db)):
     return { "Aucun Professeur n'a été enregistré."}
     
 @router.get("/verifier feuille")
-def voir_feuille_donné(db: Session = Depends(get_db))
+def voir_feuille_donné(db: Session = Depends(get_db)):
     gestion=db.querry(models.Gestion).all()
 
     trimestre_enregistre=db.query(models.Trimestre).filter(models.Trimestre.nom_trimestre).all()

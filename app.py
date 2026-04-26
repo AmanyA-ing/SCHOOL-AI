@@ -6,9 +6,9 @@ app = FastAPI(title="BOSCO AI")
 init_db()
 
 app.include_router(recorder_data.router, prefix="/api",tags=["Enregistreur de donnes"])
-app.include_router(get.router, prefix="/api",tags=["Affichage"])
+app.include_router(get_data.router, prefix="/api",tags=["Affichage"])
 app.include_router(update_data.router, prefix="/api",tags=["Modifier donnés"])
-app.include_router(delete.router, prefix="/api",tags=["Supprimés donnés"])
+app.include_router(delete_data.router, prefix="/api",tags=["Supprimés donnés"])
 
 @app.get("/")
 def home():

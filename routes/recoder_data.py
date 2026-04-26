@@ -67,9 +67,8 @@ def enregistreur_feuille_donne(professeur: str, classe:str, feuille:str, nombre_
     gestion=db.querry(models.Gestion).all()
     trimestre_existe=db.query(models.Trimestre).filter(models.Trimestre.nom_trimestre).all()
     date_jour=datetime.now()
-    matiere=db.query(models.Professeur).filter(
-            models.Professeur.nom_professeur== professeur.strip.lower(),
-            models.Professeur.nom_matiere= matiere.lower)
+    matiere=db.query(models.Gestion).filter(
+            models.Gestion.nom_matiere== professeur.strip.lower()).first()
     if gestion:
         for trimestre in trimestre_existe:
             trimestre_actuel=db.query(models.Trimestre).filter(
@@ -84,7 +83,7 @@ def enregistreur_feuille_donne(professeur: str, classe:str, feuille:str, nombre_
                 nom_feuille=feuille.strip.lower(),
                 nombre_feuille=nombre_feuille,
                 nom_trimestre=trimestre_actuel,
-                date=datetime.now
+                date=datetime.now,
                 matiere=matiere
             )
             db.add(feuille_donne_enregistre)
