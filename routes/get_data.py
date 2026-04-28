@@ -1,9 +1,9 @@
-from fastapi import RouterAPI, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
-from .. import models
-from .. database import get_db
-router=RouterAPI()
+import models
+from database import get_db
+router=APIRouter()
 
 @router.get("/voir-trimestre")
 def voir_trimestre(db: Session = Depends(get_db)):

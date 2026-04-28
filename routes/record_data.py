@@ -1,10 +1,12 @@
-from fastapi import RouterAPI, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
-from .. import models
-from .. database import get_db
-router=RouterAPI()
+import  models
+from database import get_db
+router=APIRouter()
+
 # ---ROUTES POUR ENREGISTRER LES DONNEES
+
 @router.post("/enregistrement-trimestre")
 def enregistreur_trimestre(trimestre: str,  debut: str, fin: str, db: Session = Depends(get_db)):
     if not trimestre:

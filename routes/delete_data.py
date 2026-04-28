@@ -1,11 +1,11 @@
-from fastapi import RouterAPI, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime
-from . import models
+import models
 from database import get_db, fichier_nom
 import os
 import shutil
-router=RouterAPI()
+router=APIRouter()
 
 @router.delete("/supprimer-trimestre/{trimestre_id}", status_code=status.HTTP_204_NO_CONTENT)
 def supprimer_trimestre(id_trimestre: int, db: Session=Depends(get_db)):

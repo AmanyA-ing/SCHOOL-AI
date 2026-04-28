@@ -1,10 +1,10 @@
-from fastapi import RouterAPI, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
-from .. import models
-from .. database import get_db
+import models
+from database import get_db
 
-router=RouterAPI()
+router=APIRouter()
 
 @router.patch("/modifier-gestion/{gestion_id}")
 def modifier_gestion(gestion_id: int, donnes: dict, db: Session = Depends(get_db)):
