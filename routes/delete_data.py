@@ -7,61 +7,66 @@ import os
 import shutil
 router=APIRouter()
 
-@router.delete("/supprimer-trimestre/{trimestre_id}", status_code=status.HTTP_204_NO_CONTENT)
-def supprimer_trimestre(id_trimestre: int, db: Session=Depends(get_db)):
-    ligne_trimestre=db.query(models.Trimestre).filter(models.Trimestre.id==id_trimestre).first()
-    if not ligne_trimestre:
-        raise HTTPException(status_code=404, detail="Enregistrement introuvable")
-    db.query(models.Gestion).filter(
-        models.Gestion.nom_professeur==ligne_trimestre.nom_processeur).delete()
+@router.delete("/supprimer-trimestre/{id_trimestre}") 
+def supprimer_trimestre(id_trimestre: int, db: Session = Depends(get_db)):
 
-    db.delete(ligne_trimestre)
+    trimestre = db.query(models.Trimestre).filter(models.Trimestre.id == id_trimestre).first()
+    
+    if not trimestre:
+        raise HTTPException(status_code=404, detail="Trimestre introuvable")
+
+    db.query(models.Gestion).filter(
+        models.Gestion.nom_trimestre == trimestre.nom_trimestre
+    ).delete()
+
+    db.delete(trimestre)
     db.commit()
 
-    return {
-        "message": "trimestre supprimé avec succès!",
-    }
+    return {"message": f"Le trimestre {trimestre.nom_trimestre} et ses données ont été supprimés."}
 
-@router.delete("/supprimer-Classe/{classe_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/supprimer-Classe/{classe_id}")
 def supprimer_classe(id_classe: int, db: Session=Depends(get_db)):
-    ligne_classe=db.query(models.Classe).filter(models.Classe.id==id_classe).first()
-    if not ligne_classe:
-        raise HTTPException(status_code=404, detail="Enregistrement introuvable")
-    db.query(models.Gestion).filter(
-        models.Gestion.nom_classe==ligne_classe.nom_classe).delete()
 
-    db.delete(ligne_classe)
+    classe=db.query(models.Classe).filter(models.Classe.id==id_classe).first()
+    if not classe:
+        raise HTTPException(status_code=404, detail="Enregistrement introuvable")
+    
+    db.query(models.Gestion).filter(
+        models.Gestion.nom_classe==classe.nom_classe
+        ).delete()
+
+    db.delete(classe)
+    db.commit()
+
+    return { 
+        "message": f"La classe {classe.nom_classe} et ses données ont été supprimés."}
+
+@router.delete("/supprimer-Materiel/{materiel_id}")
+def supprimer_materiel(id_materiel: int, db: Session=Depends(get_db)):
+    materiel=db.query(models.Materiel).filter(models.Materiel.id==id_materiel).first()
+    if not materiel:
+        raise HTTPException(status_code=404, detail="Enregistrement introuvable")
+
+    db.query(models.Gestion).filter(
+        models.Gestion.nom_materiel==materiel.nom_materiel).delete()
+
+    db.delete(materiel)
     db.commit()
 
     return {
-        "message": "classe supprimé avec succès!",
+        "Réussi":  f"Le materiel {matieriel.nom_materiel} et ses données ont été supprimés.",
     }
 
-@router.delete("/supprimer-Feuille/{feuille_id}", status_code=status.HTTP_204_NO_CONTENT)
-def supprimer_feuille(id_feuille: int, db: Session=Depends(get_db)):
-    ligne_feuille=db.query(models.Feuille).filter(models.Feuille.id==id_feuille).first()
-    if not ligne_feuille:
-        raise HTTPException(status_code=404, detail="Enregistrement introuvable")
-    db.query(models.Gestion).filter(
-        models.Gestion.nom_classe==ligne_feuille.nom_feuille).delete()
-
-    db.delete(ligne_feuille)
-    db.commit()
-
-    return {
-        "Réussi": "feuille supprimé avec succès!",
-    }
-
-@router.delete("/supprimer-Professeur/{professeur_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/supprimer-Professeur/{professeur_id}")
 def supprimer_professeur(id_professeur: int, db: Session=Depends(get_db)):
-    ligne_professeur=db.query(models.Professeur).filter(
+    professeur=db.query(models.Professeur).filter(
         models.Professeur.id==id_professeur).first()
-    if not ligne_professeur:
+    if not professeur:
         raise HTTPException(status_code=404, detail="Enregistrement introuvable")
     db.query(models.Gestion).filter(
-        models.Gestion.nom_classe== ligne_professeur.nom_professeur).delete()
+        models.Gestion.nom_professeur== professeur.nom_professeur).delete()
 
-    db.delete(ligne_professeur)
+    db.delete(professeur)
     db.commit()
 
     return {
@@ -93,14 +98,10 @@ def supprimer_tout(db: Session = Depends(get_db)):
         jour_renitialiser= datetime.now().strftime("%Y")
         nom_archive = f"./archives_db/{fichier_nom}-{jour_renitialiser}".db
         
-        shutil.copy2("./bosco.db", nom_archive)
+        shutil.copy2(f"./bosco{fichier_nom}.db", nom_archive)
 
         db.query(models.Gestion).delete()
-        db.query(models.Feuille).delete()
-        db.query(models.Classe).delete()
-        db.query(models.Trimestre).delete()
-        db.query(models.Professeur).delete()
-        
+        db.query(models.Trimestre).delete()        
         db.commit()
         
         return {

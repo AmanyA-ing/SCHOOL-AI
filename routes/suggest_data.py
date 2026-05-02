@@ -16,11 +16,11 @@ def rechercher_professeur(recherche: str, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/suggestions/feuilles")
-def suggerer_feuille(db: Session = Depends(get_db)):
+@router.get("/suggestions/materiels")
+def suggerer_materiel(db: Session = Depends(get_db)):
     try:
-        feuille_enregistre = db.query(models.Feuille.nom_feuille).all()
-        return [feuille[0] for feuille in feuille_enregistre]
+        materiel_enregistre = db.query(models.Materiel.nom_materiel).all()
+        return [materiel[0] for materiel in materiel_enregistre]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -33,7 +33,7 @@ def suggerer_Trimestre(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/classe/info/{nom}")
-def suggerer_classe_feuille(nom: str, db: Session = Depends(get_db)):
+def suggerer_classe_materiel(nom: str, db: Session = Depends(get_db)):
     classe = db.query(models.Classe).filter(models.Classe.nom_classe == nom).first()
     if classe:
         return {

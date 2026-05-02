@@ -1,82 +1,61 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from datetime import datetime
+from sqlalchemy import desc
+from datetime import datetime, timedelta
 import models
 from database import get_db
 router=APIRouter()
 
 @router.get("/voir-trimestre")
 def voir_trimestre(db: Session = Depends(get_db)):
-   
-    trimestre = db.query(models.Trimestre).all()
-    if trimestre:
-        return {
-            "trimestre": trimestre
+    trimestres = db.query(models.Trimestre).all()
+    
+    if not trimestres:
+        return {"message":"Aucun trimestre enregistré"}
 
-        }
-    return { "Aucun trimestre/semestre n'a été enregistré."}
-
+    return trimestres
 
 @router.get("/voir-classe")
 def voir_classe(db: Session = Depends(get_db)):
    
     classe= db.query(models.Classe).all()
-    if classe: 
-        return {
-            "Classe": classe
-        } 
-    return { "Aucune classe n'a été enregistrée."}
+    if not classe:  
+        return { "message":"Aucune classe n'a été enregistrée."}
+    return classe
 
-@router.get("/voir-feuille")
-def voir_feuille(db: Session = Depends(get_db)):
+@router.get("/voir-materiel")
+def voir_materiel(db: Session = Depends(get_db)):
     
-    feuille = db.query(models.Feuille).filter(models.Feuille.nom_feuille.strip.lower()).first()
-    
-    if feuille:
-        return {
-            "Type de Feuille":feuille
-        }
-    return { "Aucune feuille n'a été enregistrée."}
+    materiel = db.query(models.Materiel).all()
+    return materiel if materiel else { "message":"Aucun materiel n'a été enregistré."}
 
 @router.get("/voir-Professeur")
-def voir_feuille(db: Session = Depends(get_db)):
+def voir_professeur(db: Session = Depends(get_db)):
     professeur_total=db.query(models.Professeur).all()
-    professeur = db.query(models.Professeur).filter(models.Professeur.nom_professeur).first()
-    matiere = db.query(models.Professeur).filter(models.Professeur.nom_matiere).first()
-    genre= db.query(models.Professeur).filter(models.Professeur.nom_matiere).first()
+    return professeur_total if professeur_total else {"message":"Aucun professeur n'a été enregistré"}
     
-    if professeur_total:
-        return {
-            "Professeur ":professeur,
-            "Matiere":matiere,
-            "Genre":genre
-            }
-    return { "Aucun Professeur n'a été enregistré."}
+@router.get("/voir-historique")
+def voir_historique_mensuel(nom_prof: str = None, db: Session = Depends(get_db)):
+
+    il_y_a_30_jours = datetime.now() - timedelta(days=30)
     
-@router.get("/verifier feuille")
-def voir_feuille_donné(db: Session = Depends(get_db)):
-    gestion=db.querry(models.Gestion).all()
+    query = db.query(models.Gestion).filter(models.Gestion.date >= il_y_a_30_jours)
 
-    trimestre_enregistre=db.query(models.Trimestre).filter(models.Trimestre.nom_trimestre).all()
+    if nom_prof:
 
-    date_enregistrement=db.query(models.Gestion).filter(
-                models.Gestion.nom_trimestre == trimestre.strip.lower(),
-                models.Trimestre.date
-            ).first()
+        query = query.filter(models.Gestion.nom_professeur.ilike(f"%{nom_prof.strip()}%"))
 
-    trimestre=db.query(models.Trimestre).filter(
-                models.Trimestre.nom_trimestre == trimestre.strip.lower(),
-                models.Trimestre.date_debut <= date_enregistrement,
-                models.Trimestre.date_fin >= date_enregistrement).first()
 
-    feuille_donne=db.querry(models.gestion).all()
+    enregistrements = query.order_by(desc(models.Gestion.date)).limit(40).all()
+    liste_finale = [
+        {
+            "professeur": ligne.nom_professeur,
+            "classe": ligne.nom_classe,
+            "materiel": ligne.nom_materiel,
+            "quantite": ligne.quantite_materiel,
+            "date": ligne.date.strftime("%d/%m/%Y à %H:%M") # Format plus complet
+        } 
+        for ligne in enregistrements
+    ]
 
-    if gestion:
-        for trimestre in trimestre_enregistre:
-       
-            return{
-                "trimestre:":"{trimestre_enregistré}",
-                "feuille donne":feuille_donne
-            }
-    return { "Aucune feuille n'a été donnée à un Professeur."}
-
+    return {"historique": liste_finale}

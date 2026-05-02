@@ -1,5 +1,5 @@
 import enum
-from sqlalchemy import Column, Integer, String, Enum, Float, Text, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Enum, Float, Text, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database import Base
@@ -11,7 +11,7 @@ class Genre(enum.Enum):
 
 # Class original
 class Trimestre(Base):
-    __tablename__ = "trimestre"
+    __tablename__ = "trimestre/semestre"
     id = Column(Integer, primary_key=True, index=True)
     nom_trimestre = Column(String)
     date_debut = Column(DateTime)
@@ -21,28 +21,28 @@ class Professeur(Base):
     __tablename__ = "professeur"
     id = Column(Integer, primary_key=True, index=True)
     genre_professeur = Column(Enum(Genre), default=Genre.MASCULIN, nullable=False)
-    nom_professeur = Column(String, unique=True, index=True)
+    nom_professeur = Column(String(50), unique=True, index=True)
     nom_matiere = Column(String)
     
 class Classe(Base):
     __tablename__ = "Classe"
     id = Column(Integer, primary_key=True, index=True)
-    nom_classe = Column(String)
-    nombre_effectif = Column(Integer)
+    nom_classe = Column(String, unique=True, nullable=False)
+    nombre_effectif = Column(Integer,default=38, nullable=False)
 
-class Feuille(Base):
-    __tablename__ = "Type de feuille"
+class Materiel(Base):
+    __tablename__ = "matériel"
     id = Column(Integer, primary_key=True, index=True)
-    nom_feuille = Column(String)
-    marque_feuille= Column(Integer,default="feuille simple")
+    nom_materiel = Column(String, unique=True,nullable=False )
+    marque= Column(Integer,default="materiel simple")
 
 class Gestion(Base):
-    __tablename__ = "Gestion des feuilles"
+    __tablename__ = "Historique des materiels"
     id = Column(Integer, primary_key=True, index=True)
-    nom_professeur = Column(String, unique=True, index=True)
+    nom_professeur = Column(String(50), unique=True, index=True,nullable=False)
     nom_matiere=Column(String)
     nom_classe = Column(String)
-    nom_feuille = Column(String)
-    nombre_feuille = Column(Integer)
+    nom_materiel = Column(String)
+    quantite_materiel = Column(Integer,default=0, nullable=False)
     nom_trimestre = Column(String)
-    date=Column(String, default=datetime.now)
+    date=Column(DateTime, default=func.now())
